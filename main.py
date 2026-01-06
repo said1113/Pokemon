@@ -34,5 +34,33 @@ async def go(ctx):
             await ctx.send("Pokémonun görüntüsü yüklenemedi!")
     else:
         await ctx.send("Zaten kendi Pokémonunuzu oluşturdunuz!")  # Bir Pokémon'un daha önce oluşturulup oluşturulmadığını gösteren bir mesaj
+
+@bot.command()
+async def guess(ctx, tahmin: str):
+    author = ctx.author.name
+    if author in Pokemon.pokemons:
+        pokemon = Pokemon.pokemons[author]
+        dogru_isim = await pokemon.get_name()
+        
+        if tahmin.lower() == dogru_isim.lower():
+            Pokemon.points[author] += 100
+            await ctx.send(f"Tebrikler {author}! Doğru bildin. +100 Puan kazandın!")
+            pokemon.pokemon_number = random.randint(1, 1000)
+            pokemon.name = await pokemon.get_name()
+            await ctx.send(f"Yeni Pokémonun hazır! Resmini görmek için `!go` yazabilirsin.")
+        else:
+            await ctx.send(f"Maalesef yanlış! Bu Pokémon'un adı {dogru_isim} idi. Tekrar dene!")
+    else:
+        await ctx.send("Önce `!go` yazarak bir Pokémon edinmelisin!")
+
+@bot.command()
+async def mypoints(ctx):
+    author = ctx.author.name
+    puan = Pokemon.points.get(author, 0)
+    await ctx.send(f"{author}, şu anki toplam puanın: {puan}")
+
+# Botun çalıştırılması
+bot.run(token)
+
 # Botun çalıştırılması
 bot.run(token)
